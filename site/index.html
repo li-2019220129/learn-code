@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>算法精讲 200 题 · 刷题学习手册</title>
+<meta name="description" content="基于《吴师兄学算法 LeetCode 精讲》整理的算法学习手册：55 天刷题计划、230+ 道题解、Java / C++ / Python 三语言参考代码。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/problem.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="menuBtn" class="icon-btn" aria-label="打开目录">☰</button>
+  <a class="brand" href="#/">⚡ 算法精讲 <span class="brand-sub">200 题</span></a>
+  <div class="search-wrap">
+    <input id="searchInput" type="search" placeholder="搜索题号 / 题名 / 关键词…" autocomplete="off">
+    <div id="searchResults" class="search-results hidden"></div>
+  </div>
+  <div class="topbar-right">
+    <div class="progress-chip" id="progressChip" title="总体学习进度">0%</div>
+    <button id="themeBtn" class="icon-btn" aria-label="切换深浅主题">🌙</button>
+  </div>
+</header>
+<div id="layout">
+  <aside id="sidebar"><nav id="sidebarNav" class="sidebar-nav"></nav></aside>
+  <div id="overlay"></div>
+  <main id="main"><div class="loading">正在加载题库…</div></main>
+</div>
+<script src="data/data.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+/* 题目页：头部、小节、代码块、上下一题导航 */
+
+.crumbs { font-size: 13px; color: var(--text-3); margin-bottom: 10px; }
+.crumbs a { color: var(--text-2); }
+.prob-head {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px 28px 20px; box-shadow: var(--shadow);
+}
+.prob-head h1 { margin: 0 0 10px; font-size: 24px; line-height: 1.4; }
+.prob-head h1 .lc-num { color: var(--accent); font-family: var(--mono); font-size: 20px; margin-right: 6px; }
+.meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.badge {
+  font-size: 12px; font-weight: 600; border-radius: 999px; padding: 3px 11px;
+  background: var(--bg-hover); color: var(--text-2);
+}
+.badge.accent { background: var(--accent-soft); color: var(--accent); }
+.meta-link { font-size: 12.5px; margin-left: auto; }
+.done-btn {
+  border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-2);
+  border-radius: 999px; padding: 5px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  transition: all .15s;
+}
+.done-btn.on { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* 语言过滤工具条 */
+.lang-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 18px 0 4px; }
+.lang-toolbar .lt-label { font-size: 12.5px; color: var(--text-3); margin-right: 2px; }
+.lang-btn {
+  border: 1px solid var(--border); background: var(--bg-card); color: var(--text-2);
+  border-radius: 999px; padding: 4px 13px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+}
+.lang-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* 小节卡片 */
+.prob-sections { margin-top: 8px; }
+.sec {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 22px 28px; margin-top: 14px; box-shadow: var(--shadow);
+}
+.sec > h2 { margin: 0 0 12px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.sec > h2::before {
+  content: ""; width: 4px; height: 18px; border-radius: 4px; flex-shrink: 0;
+  background: linear-gradient(var(--accent), var(--accent-2));
+}
+.sec h3.blk-h { margin: 18px 0 6px; font-size: 15.5px; }
+.sec p { margin: 10px 0; }
+.sec .sec-note {
+  background: var(--amber-soft); color: var(--amber);
+  border-radius: 10px; padding: 10px 14px; font-size: 13.5px; margin: 10px 0;
+}
+
+/* 代码块 */
+.codeblock { margin: 14px 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-code); }
+.codeblock-head {
+  display: flex; align-items: center; padding: 7px 14px;
+  border-bottom: 1px solid var(--border); background: var(--bg-card);
+}
+.codeblock-lang {
+  font-size: 11.5px; font-weight: 700; letter-spacing: .4px;
+  color: var(--text-3); text-transform: uppercase; font-family: var(--mono);
+}
+.copy-btn {
+  margin-left: auto; border: 0; background: none; color: var(--text-3);
+  font-size: 12px; cursor: pointer; padding: 2px 6px; border-radius: 6px;
+}
+.copy-btn:hover { background: var(--bg-hover); color: var(--text); }
+.codeblock pre {
+  margin: 0; padding: 14px 16px; overflow-x: auto;
+  font-family: var(--mono); font-size: 13px; line-height: 1.65; color: var(--code-text);
+}
+.tok-c { color: var(--tok-c); font-style: italic; }
+.tok-k { color: var(--tok-k); font-weight: 600; }
+.tok-s { color: var(--tok-s); }
+.tok-n { color: var(--tok-n); }
+
+/* 语言偏好过滤：只显示所选语言的题解代码（示例块始终显示） */
+body.pref-java .codeblock.is-code:not(.lang-java),
+body.pref-cpp .codeblock.is-code:not(.lang-cpp),
+body.pref-python .codeblock.is-code:not(.lang-python) { display: none; }
+
+/* 上一题 / 下一题 */
+.pn-nav { display: flex; gap: 12px; margin-top: 22px; }
+.pn-card {
+  flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 13px 17px; color: var(--text); transition: border-color .15s, transform .15s;
+  min-width: 0;
+}
+.pn-card:hover { text-decoration: none; border-color: var(--accent); transform: translateY(-1px); }
+.pn-card.next { text-align: right; }
+.pn-label { font-size: 11.5px; color: var(--text-3); }
+.pn-title { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pn-empty { visibility: hidden; }
+
+@media (max-width: 900px) {
+  .prob-head, .sec { padding: 18px 16px; }
+}

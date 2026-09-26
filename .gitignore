@@ -1,0 +1,8 @@
+# 本地私有文件：原 PDF 与临时产物不进仓库
+*.pdf
+*.png
+sample_problem.json
+outline.json
+__pycache__/
+*.pyc
+.DS_Store
