@@ -119,17 +119,21 @@ def _is_new_para(prev, ln):
 def _reclassify(lines_):
     """紧邻代码的注释样式正文行（整行中文注释）重新归为代码行。"""
     for i, ln in enumerate(lines_):
-        if ln['code'] or not COMMENT_RE.match(ln['text']):
+        if ln.get('cluster'):
             continue
-        near_prev = any(x['code'] for x in lines_[max(0, i - 3):i])
-        near_next = any(x['code'] for x in lines_[i + 1:i + 4])
+        if ln.get('code') or not COMMENT_RE.match(ln.get('text', '')):
+            continue
+        near_prev = any(x.get('code') for x in lines_[max(0, i - 3):i])
+        near_next = any(x.get('code') for x in lines_[i + 1:i + 4])
         if near_prev or near_next:
             ln['code'] = True
 
 
-def build_blocks(lines_, hint=None, url_out=None):
+def build_blocks(lines_, hint=None, url_out=None, pid=None, illus=None):
     """把行序列转为内容块列表：
-    {t:'p'|'h'|'code'|'note', x, lang?}
+    {t:'p'|'h'|'code'|'note'|'img', x, lang?, src?, page?}
+    行流中可混入 {'cluster': 簇, 'page': 页码, 'y': y} 形式的图解标记，
+    由 illus（IllustrationExtractor）按需渲染并产出 img 块。
     url_out: 可选列表，用于带回代码注释里发现的 LeetCode 链接。
     """
     _reclassify(lines_)
@@ -169,6 +173,14 @@ def build_blocks(lines_, hint=None, url_out=None):
             code = []
 
     for ln in lines_:
+        if ln.get('cluster'):
+            flush_para()
+            flush_code()
+            src = illus.ensure_rendered(ln['cluster'], ln['page'], pid)
+            if src:
+                blocks.append({'t': 'img', 'src': src, 'page': ln['page'] + 1})
+            prev = None
+            continue
         txt = ln['text'].strip()
         if not txt:
             flush_para()

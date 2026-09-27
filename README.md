@@ -8,6 +8,7 @@
 
 - **55 天刷题计划**：按天分组的题目导航，天数折叠展开
 - **题目详情**：题面 / 解析 / 三语言题解 / 复杂度分析，代码语法高亮 + 一键复制
+- **原书图解**：自动从 PDF 提取题目配图（88 张），插入正文对应位置，点击放大查看
 - **语言过滤**：全部 / Java / C++ / Python 一键切换，只看想看的题解
 - **搜索**：支持题号、题名、正文关键词，结果高亮
 - **学习进度**：标记完成、按天/总体进度统计，保存在浏览器 localStorage
@@ -24,6 +25,7 @@ learn-code/
 │   ├── textnorm.py             # 文本规范化（部首字符修复等）
 │   ├── outline.py              # PDF 书签 -> 天/题目/小节 结构
 │   ├── content.py              # 页面行提取、代码/正文分块
+│   ├── illustrations.py        # 图解提取：矢量绘图聚类 -> site/images/
 │   ├── problem.py              # 单题解析编排
 │   └── build.py                # 构建入口: python -m tools.build
 ├── site/                       # 纯静态站点（部署产物，无需构建）
@@ -31,6 +33,7 @@ learn-code/
 │   ├── css/                    # base / sidebar / home / problem
 │   ├── js/                     # ES Modules: main(路由) / state / sidebar /
 │   │                           #   home / problem / search / highlight / dom
+│   ├── images/                 # 构建生成的原书图解（按题号分目录）
 │   └── data/
 │       └── data.js             # 构建生成的题库数据（window.ALGO_DATA）
 └── .github/workflows/

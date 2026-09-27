@@ -99,6 +99,7 @@ function renderBlock(b) {
   if (b.t === 'p') return h('p', null, b.x);
   if (b.t === 'h') return h('h3', 'blk-h', b.x);
   if (b.t === 'note') return h('div', 'sec-note', b.x);
+  if (b.t === 'img') return buildIllustration(b);
 
   /* 代码块 */
   const wrap = h('div', 'codeblock' + (b.lang !== 'text' ? ' is-code' : '') + ' lang-' + b.lang);
@@ -118,6 +119,32 @@ function renderBlock(b) {
   pre.innerHTML = highlight(b.x, b.lang);
   wrap.appendChild(pre);
   return wrap;
+}
+
+/* 图解：懒加载图片 + 点击放大灯箱 */
+function buildIllustration(b) {
+  const fig = h('figure', 'illus');
+  const img = document.createElement('img');
+  img.src = b.src;
+  img.loading = 'lazy';
+  img.alt = `原书图解（第 ${b.page} 页）`;
+  img.addEventListener('click', () => openLightbox(b.src));
+  fig.appendChild(img);
+  fig.appendChild(h('figcaption', null, `原书图解 · 第 ${b.page} 页 · 点击放大`));
+  return fig;
+}
+
+function openLightbox(src) {
+  let lb = document.getElementById('lightbox');
+  if (!lb) {
+    lb = h('div', 'lightbox');
+    lb.id = 'lightbox';
+    lb.appendChild(h('img'));
+    lb.addEventListener('click', () => lb.classList.remove('show'));
+    document.body.appendChild(lb);
+  }
+  lb.querySelector('img').src = src;
+  lb.classList.add('show');
 }
 
 function buildPrevNext(pid) {

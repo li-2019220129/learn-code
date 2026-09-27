@@ -48,7 +48,12 @@ $('overlay').addEventListener('click', closeSidebarMobile);
 
 /* Esc 关闭弹层；题目页 ← / → 切换上下一题 */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { hideResults(); closeSidebarMobile(); return; }
+  if (e.key === 'Escape') {
+    hideResults();
+    closeSidebarMobile();
+    document.getElementById('lightbox')?.classList.remove('show');
+    return;
+  }
   if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
   const m = location.hash.match(/^#\/p\/(.+)$/);
   if (!m) return;

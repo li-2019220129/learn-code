@@ -11,9 +11,10 @@ ANIM_RE = re.compile(r'动画|视频')
 
 
 class ProblemParser:
-    def __init__(self, doc, day_titles=()):
+    def __init__(self, doc, day_titles=(), illus=None):
         self.doc = doc
         self.day_titles = {norm_key(t) for t in day_titles}
+        self.illus = illus
         self.lines = LineExtractor(doc)
 
     # ---- 对外入口 ----
@@ -40,21 +41,23 @@ class ProblemParser:
 
         subs = sorted(p['subs'], key=lambda s: (s['page'], s['y']))
         self._mark_children(subs)
-        intro_lines = self._split_lines(lines, subs,
+        stream = self._build_stream(lines, start, end)
+        intro_lines = self._split_lines(stream, subs,
                                         skip_titles=self._skip_titles(p, subs, self.day_titles))
 
         url = [None]
         sections = []
         if intro_lines:
-            blocks = build_blocks(intro_lines, url_out=url)
+            blocks = build_blocks(intro_lines, url_out=url, pid=pid, illus=self.illus)
             if blocks:
                 sections.append({'title': None, 'blocks': blocks})
         for s in subs:
             sub_lines = s.pop('_lines', [])
-            blocks = build_blocks(sub_lines, hint=s['title'], url_out=url)
+            blocks = build_blocks(sub_lines, hint=s['title'], url_out=url,
+                                  pid=pid, illus=self.illus)
             if url[0] is None:
                 for ln in sub_lines:
-                    mu = LEET_URL_RE.search(ln['text'])
+                    mu = LEET_URL_RE.search(ln.get('text', ''))
                     if mu:
                         url[0] = 'https://leetcode.cn/problems/' + mu.group(1) + '/'
                         break
@@ -80,6 +83,23 @@ class ProblemParser:
             k += 1
         used_ids.add(pid)
         return pid
+
+    def _build_stream(self, lines, start, end):
+        """把图解簇以标记形式插入行流，并剔除被图解吸收的文字标签。"""
+        if self.illus is None:
+            return lines
+        clusters = self.illus.clusters_in_region(start, end)
+        if not clusters:
+            return lines
+        absorbed = set()
+        for c in clusters:
+            for ln in lines:
+                if not ln['code'] and id(ln) not in absorbed and self.illus.absorbs(c, ln):
+                    absorbed.add(id(ln))
+        markers = [{'page': c['page'], 'y': c['rect'].y0, 'x0': c['rect'].x0,
+                    'cluster': c, 'size': 10} for c in clusters]
+        kept = [ln for ln in lines if id(ln) not in absorbed]
+        return sorted(kept + markers, key=lambda x: (x['page'], x['y'], x.get('x0', 0)))
 
     @staticmethod
     def _skip_titles(p, subs, all_day_titles):
@@ -107,8 +127,8 @@ class ProblemParser:
         intro = []
         first = (subs[0]['page'], subs[0]['y']) if subs else None
         for ln in lines:
-            key = norm_key(ln['text'])
-            if not ln['code'] and key and key in skip_titles:
+            key = norm_key(ln.get('text', ''))
+            if not ln.get('code') and key and key in skip_titles:
                 continue
             if first and (ln['page'], ln['y']) < (first[0], first[1] - 2.0):
                 intro.append(ln)
@@ -127,14 +147,19 @@ class ProblemParser:
 
     @staticmethod
     def _finalize_sections(sections, pdf_page):
-        """空小节处理：有孩子的父级直接丢弃；空叶子（图解/动画）替换为提示。"""
+        """空小节处理：有孩子的父级直接丢弃；空叶子（图解/动画）替换为提示。
+        图片块算内容：有图解的小节不再额外加提示。"""
         final = []
         for s in sections:
             title, blocks = s['title'], s['blocks']
-            has_content = any(b.get('x', '').strip() for b in blocks)
+            has_imgs = any(b['t'] == 'img' for b in blocks)
+            has_content = has_imgs or any(b.get('x', '').strip() for b in blocks)
             if title and ANIM_RE.search(title):
-                final.append({'title': title,
-                              'blocks': [{'t': 'note', 'x': f'此部分为动画演示，请配合原 PDF（第 {pdf_page} 页起）学习。'}]})
+                if not has_imgs:
+                    blocks = [{'t': 'note', 'x': f'此部分为动画演示，请配合原 PDF（第 {pdf_page} 页起）学习。'}]
+                else:
+                    blocks = blocks + [{'t': 'note', 'x': f'以上为原书动画的关键帧（第 {pdf_page} 页起），完整动画可配合原 PDF / 视频观看。'}]
+                final.append({'title': title, 'blocks': blocks})
                 continue
             if not has_content:
                 if title is None or s.get('_children'):
@@ -142,7 +167,7 @@ class ProblemParser:
                 final.append({'title': title,
                               'blocks': [{'t': 'note',
                                           'x': f'此部分在原 PDF 中为图解/动画（第 {pdf_page} 页起），'
-                                               f'文字版未收录，建议对照原书图示理解。'}]})
+                                               f'未能提取到图形内容，建议对照原书理解。'}]})
                 continue
             final.append({'title': title, 'blocks': blocks})
         return final
